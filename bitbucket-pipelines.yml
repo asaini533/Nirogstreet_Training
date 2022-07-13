@@ -1,0 +1,92 @@
+#  Template NodeJS build
+
+#  This template allows you to validate your NodeJS code.
+#  The workflow allows running tests and code linting on the default branch.
+
+image: node:14.17.0
+
+pipelines:
+  branches:
+    master:
+        # - step:
+        #     name: Build flutter
+        #     image: cirrusci/flutter
+        #     script:
+        #       - cd client/livspace_customer                   
+        #       - flutter build apk
+        #     artifacts:
+        #         - client/livspace_customer/build/app/outputs/** 
+        - step:
+            name: Build and Test functions
+            caches:
+              - node
+            script:
+              - npm install -g npm@7.20.0
+              - cd functions
+              - npm install
+              - sh create-db.sh test
+              - sh run_migration.sh test
+              - npm test
+              - npm run coverageBitBucket
+            artifacts:
+              - functions/coverage/**
+            services: 
+              - postgres
+        - step:
+            name: sonar analysiss 
+            script:
+              - pipe: sonarsource/sonarqube-scan:1.0.0
+                variables:
+                  SONAR_HOST_URL:   'https://sonar.napses.in'
+                  SONAR_TOKEN:      $SONAR_TOKEN
+                  EXTRA_ARGS: '-Dsonar.projectKey=livspace:test
+                  -Dsonar.projectName=livspace
+                  -Dsonar.projectVersion=1.0
+                  -Dsonar.sourceEncoding=UTF-8
+                  -Dsonar.sources=functions,ui,admin,client
+                  -Dsonar.exclusions=**/test/**,**/migrations/**,**/notifications/**,**/lib/**,**/seeders/**
+                  -Dsonar.javascript.lcov.reportPaths=functions/coverage/lcov.info
+                  -Dsonar.cpd.exclusions=**/test/**,**/migrations/**,**/notifications/**,**/lib/**,**/seeders/**
+                  -Dsonar.coverage.exclusions=**/test/**,**/migrations/**,**/notifications/**,**/lib/**,**/seeders/**,**/ui/**,**/admin/**'   
+  default:
+        - step:
+            name: Build and Test functions
+            caches:
+              - node
+            script:
+              - cd functions
+              - npm install
+              - sh create-db.sh test
+              - sh run_migration.sh test
+              - npm test
+              - npm run coverageBitBucket
+            artifacts:
+              - functions/coverage/**
+            services: 
+              - postgres
+        - step:
+            name: sonar analysiss 
+            script:
+              - pipe: sonarsource/sonarqube-scan:1.0.0
+                variables:
+                  SONAR_HOST_URL:   'https://sonar.napses.in'
+                  SONAR_TOKEN:      $SONAR_TOKEN
+                  EXTRA_ARGS: '-Dsonar.projectKey=livspace:test
+                  -Dsonar.projectName=livspace
+                  -Dsonar.projectVersion=1.0
+                  -Dsonar.sourceEncoding=UTF-8
+                  -Dsonar.sources=functions,ui
+                  -Dsonar.exclusions=**/test/**,**/migrations/**,**/notifications/**,**/lib/**,**/seeders/**
+                  -Dsonar.javascript.lcov.reportPaths=functions/coverage/lcov.info
+                  -Dsonar.cpd.exclusions=**/test/**,**/migrations/**,**/notifications/**,**/lib/**,**/seeders/**
+                  -Dsonar.coverage.exclusions=**/test/**,**/migrations/**,**/notifications/**,**/lib/**,**/seeders/**,**/ui/**,**/admin/**'  
+        
+
+definitions: 
+  services: 
+    postgres: 
+      image: postgis/postgis:latest 
+      variables: 
+        POSTGRES_USER: 'root'
+        POSTGRES_PASSWORD: 'root'
+                

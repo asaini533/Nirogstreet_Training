@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://hafla.com
+
+# Sitemaps
+Sitemap: https://hafla.com/sitemap.xml

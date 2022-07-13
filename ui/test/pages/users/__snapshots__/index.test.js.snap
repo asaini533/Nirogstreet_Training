@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`users index should get users 1`] = `
+<ul
+  aria-label="users"
+>
+  <li>
+    username
+  </li>
+</ul>
+`;

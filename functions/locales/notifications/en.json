@@ -1,0 +1,20 @@
+{
+  "setPassword": {
+    "messages": {
+      "email": {
+        "subject": "Welcome to LexmiBlu",
+        "message": "<html>Hi,<br><br>Greetings from Lexmiblu.com,Pls click this link  http://lexmiblu/set-password/<setPasswordId> <br><br> Best Regards,<br>Team LexmiBlu</html>"
+      }
+    }
+  },
+  "otp": {
+    "messages": {
+      "sms": "Use OTP <otp> to login to your Livspace Account\nLivspace doesn't ask for OTP or Contact number to be shared with anyone."
+    }
+  },
+  "orderPlaced": {
+    "messages": {
+      "sms": "Hello <userName> Your Livspace order id <orderNumber> has been placed successfully and will be confirmed shortly."
+    }
+  }
+}
