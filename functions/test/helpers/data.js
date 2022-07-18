@@ -1,5 +1,8 @@
 const DeleteEntityById = require("test/data/delete-entity-by-id");
 const definations = require("test/data/factory").factory;
+const CreateUserQuery = require("../../resources/users/query/create-user-query");
+const CreateAadharQuery = require("../../resources/aadhar/query/create-aadhar-query");
+const CreateAddressQuery = require("../../resources/address/query/create-address-query");
 
 const dontBuild = () => new Promise((resolve, reject) => resolve({}));
 
@@ -27,10 +30,42 @@ const returnObject = (args) => args;
 
 const user = {
   name: "user",
-  create: (user) => [new CreateUserQuery(user)],
+  create: (user) => [
+    new CreateUserQuery(user.id, user.full_name, user.country_code),
+  ],
   build: () => entity("user"),
   delete: (user) => [new DeleteEntityById(user.id, "User")],
 };
+
+const aadhar = {
+  name: "aadhar",
+  create: (aadhar) => [
+    new CreateAadharQuery(
+      aadhar.user.full_name,
+      aadhar.user.id,
+      aadhar.aadharNumber
+    ),
+  ],
+  build: () => entity("aadhar"),
+  dependency: [[(aadhar) => aadhar.user, user]],
+  delete: (user) => [new DeleteEntityById(user.id, "Aadhar")],
+};
+
+const address = {
+  name: "address",
+  create: (address) => [
+    new CreateAddressQuery(
+      address.user.id,
+      address.user.full_name,
+      address.street,
+      address.city,
+      address.country
+    ),
+  ],
+  build: () => entity("address"),
+  delete: (user) => [new DeleteEntityById(user.id, "Aadhar")],
+};
+
 const google_auth = {
   name: "google_auth",
   create: (google_auth) => [
@@ -74,12 +109,7 @@ const user_email = {
 };
 const role = {
   name: "role",
-  create: (role) => [
-    new CreateRoleQuery(
-      role.id,
-      role.name,
-    ),
-  ],
+  create: (role) => [new CreateRoleQuery(role.id, role.name)],
   build: () => entity("role"),
   delete: (role) => [new DeleteEntityById(role.id, "Role")],
 };
@@ -93,8 +123,8 @@ const service = {
       description: service.description,
       detailed_description: service.detailed_description,
       base_price: service.base_price,
-      service_sub_category_id: service.service_sub_category_id
-    })
+      service_sub_category_id: service.service_sub_category_id,
+    }),
   ],
   dependency: [],
   build: () => entity("service"),
@@ -108,28 +138,30 @@ const organisation = {
       id: organisation.id,
       name: organisation.name,
       organisation_status: organisation.organisation_status,
-    })
+    }),
   ],
   dependency: [],
   build: () => entity("organisation"),
-  delete: (organisation) => [new DeleteEntityById(organisation.id, "Organisation")],
+  delete: (organisation) => [
+    new DeleteEntityById(organisation.id, "Organisation"),
+  ],
 };
 
 const service_category = {
-    name: "service_category",
-    create: (serviceCategory) => [
-      new CreateServiceCategoryQuery({
-        id: serviceCategory.id,
-        name: serviceCategory.name,
-        icon_url: serviceCategory.icon_url,
-        type: serviceCategory.type,
-        status: serviceCategory.status
-      })
-    ],
-    dependency: [],
-    build: () => entity("service_category"),
-    delete: (service) => [new DeleteEntityById(service.id, "ServiceCategory")],
-  };
+  name: "service_category",
+  create: (serviceCategory) => [
+    new CreateServiceCategoryQuery({
+      id: serviceCategory.id,
+      name: serviceCategory.name,
+      icon_url: serviceCategory.icon_url,
+      type: serviceCategory.type,
+      status: serviceCategory.status,
+    }),
+  ],
+  dependency: [],
+  build: () => entity("service_category"),
+  delete: (service) => [new DeleteEntityById(service.id, "ServiceCategory")],
+};
 const idea = {
   name: "idea",
   create: (idea) => [
@@ -141,12 +173,12 @@ const idea = {
       status: idea.status,
       slug: idea.slug,
       created_by: idea.created_by,
-    })
+    }),
   ],
   dependency: [],
   build: () => entity("idea"),
   delete: (idea) => [new DeleteEntityById(idea.id, "idea")],
-}
+};
 
 const contentMedia = {
   name: "contentMedia",
@@ -157,12 +189,14 @@ const contentMedia = {
       type: contentMedia.type,
       order: contentMedia.order,
       contentable_id: contentMedia.contentable_id,
-      contentable_type: contentMedia.contentable_type
-    })
+      contentable_type: contentMedia.contentable_type,
+    }),
   ],
   dependency: [],
   build: () => entity("contentMedia"),
-  delete: (contentMedia) => [new DeleteEntityById(contentMedia.id, "contentMedia")],
+  delete: (contentMedia) => [
+    new DeleteEntityById(contentMedia.id, "contentMedia"),
+  ],
 };
 
 const pricingDetail = {
@@ -174,14 +208,15 @@ const pricingDetail = {
       currency: pricingDetail.currency,
       price_breakup: pricingDetail.price_breakup,
       contentable_id: pricingDetail.contentable_id,
-      contentable_type: pricingDetail.contentable_type
-    })
+      contentable_type: pricingDetail.contentable_type,
+    }),
   ],
   dependency: [],
   build: () => entity("pricingDetail"),
-  delete: (pricingDetail) => [new DeleteEntityById(pricingDetail.id, "pricingDetail")],
+  delete: (pricingDetail) => [
+    new DeleteEntityById(pricingDetail.id, "pricingDetail"),
+  ],
 };
-
 
 const zone = {
   name: "zone",
@@ -190,8 +225,8 @@ const zone = {
       id: zone.id,
       name: zone.name,
       status: zone.status,
-      geo_location: zone.geo_location
-    })
+      geo_location: zone.geo_location,
+    }),
   ],
   dependency: [],
   build: () => entity("zone"),
@@ -201,6 +236,8 @@ const zone = {
 module.exports = {
   buildEntity,
   user,
+  aadhar,
+  address,
   google_auth,
   mobile_auth,
   user_email,
@@ -211,5 +248,5 @@ module.exports = {
   contentMedia,
   pricingDetail,
   zone,
-  organisation
+  organisation,
 };

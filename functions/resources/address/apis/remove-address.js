@@ -2,21 +2,23 @@ const Route = require("../../../route");
 const db = require("../../../db/repository");
 const uuid = require("uuid");
 const RemoveAddressQuery = require("../query/remove-address-query");
-const { respond, logInfo, whenResult } = require("../../../lib");
+const {
+  respond,
+  logInfo,
+  whenResult,
+  composeResult,
+  withArgs,
+} = require("../../../lib");
 const RemoveAddressValidation = require("../validators/remove-address-validation");
 
 async function remove(req) {
   let userId = req.params.id;
   let addressId = req.params.addId;
 
-  const validationResult = await RemoveAddressValidation.validate({
-    userId,
-    addressId,
-  });
-
-  let response = await whenResult(() => {
-    return db.execute(new RemoveAddressQuery(userId, addressId));
-  })(validationResult);
+  let response = await composeResult(
+    withArgs(db.execute, new RemoveAddressQuery(userId, addressId)),
+    RemoveAddressValidation.validate
+  )({ userId, addressId });
 
   return respond(
     response,

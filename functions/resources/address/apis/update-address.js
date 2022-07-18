@@ -1,7 +1,12 @@
 const Route = require("../../../route");
 const db = require("../../../db/repository");
 const UpdateAddressQuery = require("../query/update-address-query");
-const { respond, whenResult } = require("../../../lib");
+const {
+  respond,
+  whenResult,
+  composeResult,
+  withArgs,
+} = require("../../../lib");
 const UpdateAddressValidation = require("../validators/update-address-validation");
 
 async function put(req) {
@@ -9,19 +14,13 @@ async function put(req) {
 
   const { name, street, city, country } = req.body;
 
-  const validationResult = await UpdateAddressValidation.validate({
-    addId,
-    name,
-    street,
-    city,
-    country,
-  });
-
-  let response = await whenResult(() => {
-    return db.execute(
+  let response = await composeResult(
+    withArgs(
+      db.execute,
       new UpdateAddressQuery(addId, name, street, city, country)
-    );
-  })(validationResult);
+    ),
+    UpdateAddressValidation.validate
+  )({ addId, name, street, city, country });
 
   console.log(response);
 

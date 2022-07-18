@@ -16,7 +16,7 @@ module.exports = class CreateAddressQuery {
         id: this.details.userId,
       },
     });
-    console.log("user", user);
+    // console.log("user", this.details);
     let address = await Models.Addresses.create({
       name: this.details.name,
       street: this.details.street,

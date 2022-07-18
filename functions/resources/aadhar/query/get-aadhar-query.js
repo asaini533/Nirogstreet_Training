@@ -12,6 +12,7 @@ module.exports = class GetAadharQuery {
       where: { id: this.details.userId },
     });
 
+    console.log("userId", user);
     return user.getAadhar();
   }
 };

@@ -2,8 +2,8 @@ const { validate, notEmpty, shouldBeUuid } = require("../../../validation");
 
 const rule = {
   roleId: [
-    [notEmpty, "Role Is id mandatory!"],
-    [shouldBeUuid, "Role Id should be an UUID"],
+    [notEmpty, "Role ID is mandatory!"],
+    [shouldBeUuid, "Role Id should be an UUID!"],
   ],
 };
 

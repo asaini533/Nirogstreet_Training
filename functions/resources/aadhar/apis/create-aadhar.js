@@ -2,7 +2,13 @@ const Route = require("../../../route");
 const db = require("../../../db/repository");
 const uuid = require("uuid");
 const CreateAadharQuery = require("../query/create-aadhar-query");
-const { respond, logInfo, whenResult } = require("../../../lib");
+const {
+  respond,
+  logInfo,
+  whenResult,
+  composeResult,
+  withArgs,
+} = require("../../../lib");
 const CreateAadharValidation = require("../validators/create-aadhar-validation");
 
 async function post(req) {
@@ -15,10 +21,11 @@ async function post(req) {
     name,
   });
 
-  let response = await whenResult(() => {
-    return db.execute(new CreateAadharQuery(userId, name, aadharNumber));
-  })(validationResult);
-  
+  let response = await composeResult(
+    withArgs(db.execute, new CreateAadharQuery(userId, name, aadharNumber)),
+    CreateAadharValidation.validate
+  )({ userId, name });
+
   return respond(
     response,
     "Aadhar Created Successfully",
